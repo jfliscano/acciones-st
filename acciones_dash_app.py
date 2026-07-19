@@ -492,17 +492,18 @@ tab_chart = dbc.Container([
     html.Div(id='stats-cards', className='mb-2'),
     dcc.Store(id='chart-stats-store', data=None),
     dcc.Download(id='download-trades'),
+    html.Div(dcc.Loading(type='circle',
+                          children=dcc.Graph(id='main-chart',
+                                             style={'height': '45vh'})),
+             className='mb-2'),
     dbc.Row([
-        dbc.Col([dcc.Loading(type='circle',
-                             children=dcc.Graph(id='main-chart',
-                                                style={'height': '50vh'}))],
-                lg=8),
         dbc.Col([
             dbc.Button('Export PDF', id='export-trades-btn', color='info',
                        size='sm', className='w-100 mb-2'),
-            html.Div(id='trade-table', style={'maxHeight': '40vh', 'overflowY': 'auto'}),
-        ], lg=4),
+        ], xs=6, sm=4, md=3, lg=2),
+        dbc.Col(xs=6, sm=8, md=9, lg=10),
     ]),
+    html.Div(id='trade-table', style={'maxHeight': '35vh', 'overflowY': 'auto'}),
 ], fluid=True)
 
 tab_screener = dbc.Container([
