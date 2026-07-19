@@ -360,11 +360,12 @@ def make_chart(df, symbol, atr_period, multiplier):
     fig.update_layout(
         template='plotly_dark',
         title=dict(text=f'{symbol} — SuperTrend 1h 1y | ATR={atr_period} Mult={multiplier}',
-                   font=dict(size=16)),
-        height=650, margin=dict(l=20, r=20, t=50, b=20),
-        legend=dict(orientation='h', y=1.02, x=0, font=dict(size=11)),
-        xaxis_rangeslider_visible=False, hovermode='x unified')
-    fig.update_yaxes(title_text='Price')
+                   font=dict(size=14)),
+        autosize=True, margin=dict(l=20, r=20, t=50, b=20),
+        legend=dict(orientation='h', y=1.02, x=0, font=dict(size=10)),
+        xaxis_rangeslider_visible=False, hovermode='x unified',
+        font=dict(size=10))
+    fig.update_yaxes(title_text='')
     return fig, stats
 
 SCREENER_DAYS = 30
@@ -417,6 +418,18 @@ app.index_string = '''
   <title>{%title%}</title>
   {%favicon%}
   {%css%}
+  <style>
+    @media (max-width: 576px) {
+      h2 { font-size: 1.2rem !important; }
+      .card-body { padding: 0.4rem !important; }
+      .card-body h4 { font-size: 0.95rem !important; }
+      .card-body h6 { font-size: 0.65rem !important; }
+      .dash-table-container { overflow-x: auto !important; }
+      .dash-table-container table { font-size: 10px !important; }
+      .dash-dropdown { font-size: 13px !important; }
+      .tab-content .nav-link { font-size: 12px !important; padding: 6px 10px !important; }
+    }
+  </style>
 </head>
 <body>
   {%app_entry%}
@@ -443,21 +456,20 @@ if not ACCIONES_LIST:
 
 controls = dbc.Row([
     dbc.Col([
-        html.Label('ATR Period', className='fw-bold'),
+        html.Label('ATR', className='fw-bold mb-0'),
         dcc.Input(id='atr-input', type='number', value=10, min=2, max=50, step=1,
-                  className='form-control', style={'width': 80}),
-    ], width=2),
+                  className='form-control', style={'width': 70}),
+    ], xs=3, sm=2),
     dbc.Col([
-        html.Label('Multiplier', className='fw-bold'),
+        html.Label('Mult', className='fw-bold mb-0'),
         dcc.Input(id='mult-input', type='number', value=1.7, min=0.5, max=5.0, step=0.1,
-                  className='form-control', style={'width': 80}),
-    ], width=2),
+                  className='form-control', style={'width': 70}),
+    ], xs=3, sm=2),
     dbc.Col([
-        html.Label('Stocks cargados', className='fw-bold'),
-        html.Div(f"{len(ACCIONES_LIST)} símbolos — 1h · 1y",
-                 className='text-success mt-1 fw-bold' if ACCIONES_LIST else 'text-danger mt-1'),
-    ], width=3),
-    dbc.Col(width=5),
+        html.Small(f'{len(ACCIONES_LIST)} stocks · 1h 1y',
+                   className='text-success fw-bold' if ACCIONES_LIST else 'text-danger'),
+    ], xs=6, sm=4),
+    dbc.Col(width=0, sm=4),
 ], className='mb-2')
 
 tab_chart = dbc.Container([
@@ -470,15 +482,12 @@ tab_chart = dbc.Container([
                          for t in ACCIONES_LIST],
                 value=(ACCIONES_LIST[0] if ACCIONES_LIST else None),
                 clearable=False, style={'color': '#333'}),
-        ], width=4),
-        dbc.Col([
-            html.Label('1h · 1 año de historial', className='fw-bold mt-2 text-muted'),
-        ], width=4),
+        ], xs=12, sm=6, lg=4),
         dbc.Col([
             html.Label('\u00a0'),
             dbc.Button('Refresh Data', id='refresh-btn', color='secondary',
-                       className='w-100 mt-2'),
-        ], width=2),
+                       className='w-100'),
+        ], xs=6, sm=3, lg=2),
     ], className='mb-2'),
     html.Div(id='stats-cards', className='mb-2'),
     dcc.Store(id='chart-stats-store', data=None),
@@ -486,12 +495,13 @@ tab_chart = dbc.Container([
     dbc.Row([
         dbc.Col([dcc.Loading(type='circle',
                              children=dcc.Graph(id='main-chart',
-                                                style={'height': '55vh'}))], width=8),
+                                                style={'height': '50vh'}))],
+                lg=8),
         dbc.Col([
             dbc.Button('Export PDF', id='export-trades-btn', color='info',
                        size='sm', className='w-100 mb-2'),
-            html.Div(id='trade-table', style={'height': '52vh', 'overflowY': 'auto'}),
-        ], width=4),
+            html.Div(id='trade-table', style={'maxHeight': '40vh', 'overflowY': 'auto'}),
+        ], lg=4),
     ]),
 ], fluid=True)
 
@@ -500,16 +510,14 @@ tab_screener = dbc.Container([
         dbc.Col([
             dbc.Button('Run Screener', id='screener-btn', color='primary',
                        className='w-100'),
-            html.Small(f'Procesará {len(ACCIONES_LIST)} stocks en paralelo',
-                       className='text-muted d-block mt-1'),
-        ], width=3),
+        ], xs=6, sm=3, lg=2),
         dbc.Col([
             dbc.Button('Export PDF', id='export-screener-btn', color='info',
                        size='sm', className='w-100'),
-        ], width=1),
+        ], xs=6, sm=2, lg=1),
         dbc.Col([
             html.Div(id='screener-status', className='text-muted mt-1'),
-        ], width=8),
+        ], xs=12, sm=7, lg=9),
     ], className='mb-3'),
     dcc.Store(id='screener-store', data=None),
     dcc.Download(id='download-screener'),
@@ -575,26 +583,27 @@ def update_chart(symbol, atr_period, multiplier, _n):
     pct_cls  = 'text-success' if pct >= 0                      else 'text-danger'
     dd_cls   = 'text-danger'  if stats['max_drawdown_pct'] > 20 else 'text-warning'
 
+    cw = {"xs": 6, "sm": 4, "md": 2}
     cards = dbc.Row([
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6('Trades', className='card-subtitle text-muted'),
-            html.H4(stats['total_trades'], className='text-white')])], color='dark')),
+            html.H4(stats['total_trades'], className='text-white')])], color='dark'), width=cw),
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6('Win Rate', className='card-subtitle text-muted'),
-            html.H4(f"{stats['win_rate']}%", className='text-white')])], color='dark')),
+            html.H4(f"{stats['win_rate']}%", className='text-white')])], color='dark'), width=cw),
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6('Total PnL', className='card-subtitle text-muted'),
-            html.H4(f"{stats['total_pnl_usdt']:.2f} USDT", className=pnl_cls)])], color='dark')),
+            html.H4(f"{stats['total_pnl_usdt']:.2f} USDT", className=pnl_cls)])], color='dark'), width=cw),
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6('Final Value', className='card-subtitle text-muted'),
-            html.H4(f"{stats['final_value']:.2f} USDT", className='text-white')])], color='dark')),
+            html.H4(f"{stats['final_value']:.2f} USDT", className='text-white')])], color='dark'), width=cw),
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6('Return', className='card-subtitle text-muted'),
-            html.H4(f"{pct:.2f}%", className=pct_cls)])], color='dark')),
+            html.H4(f"{pct:.2f}%", className=pct_cls)])], color='dark'), width=cw),
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6('Max Drawdown', className='card-subtitle text-muted'),
-            html.H4(f"{stats['max_drawdown_pct']:.2f}%", className=dd_cls)])], color='dark')),
-    ], className='g-2')
+            html.H4(f"{stats['max_drawdown_pct']:.2f}%", className=dd_cls)])], color='dark'), width=cw),
+    ], className='g-1')
 
     col_map = {'type':'Type','entry_date':'Entry','exit_date':'Exit',
                'entry_price':'Entry $','exit_price':'Exit $',
@@ -605,19 +614,23 @@ def update_chart(symbol, atr_period, multiplier, _n):
         for t in reversed(stats['trades']):
             color = '#089981' if t['pnl_usdt'] >= 0 else '#f23645'
             cells = [html.Td(str(t[c]),
-                              style={'textAlign':'center','padding':'3px 6px','color':color})
+                              style={'textAlign':'center','padding':'3px 6px','color':color,
+                                     'whiteSpace':'nowrap'})
                      for c in cols]
             rows.append(html.Tr(cells))
         trade_table = html.Div([
             html.H6(f'Trades ({stats["total_trades"]})',
                     className='text-white mb-2', style={'fontWeight':600}),
-            html.Table([
-                html.Thead(html.Tr([
-                    html.Th(col_map[c], style={'padding':'4px 6px','textAlign':'center'})
-                    for c in cols])),
-                html.Tbody(rows),
-            ], style={'width':'100%','borderCollapse':'collapse','fontSize':12}),
-        ], style={'height':'50vh','overflowY':'auto'})
+            html.Div([
+                html.Table([
+                    html.Thead(html.Tr([
+                        html.Th(col_map[c], style={'padding':'4px 6px','textAlign':'center',
+                                                   'whiteSpace':'nowrap'})
+                        for c in cols])),
+                    html.Tbody(rows),
+                ], style={'borderCollapse':'collapse','fontSize':12}),
+            ], style={'overflowX':'auto'}),
+        ], style={'maxHeight':'40vh','overflowY':'auto'})
     else:
         trade_table = html.Div([
             html.H6('Trades (0)', className='text-white mb-2', style={'fontWeight':600}),
