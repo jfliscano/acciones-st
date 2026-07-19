@@ -1,0 +1,593 @@
+ALGM
+Allegro Microsystems Inc
+
+AMD
+Advanced Micro Devices Inc
+
+ARM
+Arm Holdings ADR
+
+HIMX
+Himax Technologies Inc
+
+INTC
+Intel Corporation
+
+KD
+Kyndryl Holdings Inc
+
+MRVL
+Marvell Technology Inc
+
+NTAP
+NetApp Inc
+
+ON
+ON Semiconductor Corporation
+
+ORCL
+Oracle Corporation
+
+POWI
+Power Integrations Inc
+
+Q
+Qnity Electronics Inc
+
+QCOM
+Qualcomm Incorporated
+
+SWKS
+Skyworks Solutions Inc
+
+TXN
+Texas Instruments Incorporat
+
+asx:mah
+macmahon holding limited
+
+twse:4919
+nuvoton technology corporation
+
+CRUS
+Cirrus
+
+EXEL
+Exelixis
+
+IT
+Gartner
+
+GILD
+Gilead
+
+RJF
+Raymond James Financial
+
+SF
+Stifel
+
+ENS
+Enersys
+
+AMP
+Ameriprise Financial
+
+ITRN
+Ituran
+
+FSLR
+First Solar
+
+CME
+CME Group
+
+LRN
+Stride
+
+TNET
+Trinet Grou
+
+ZTS
+Zoetis Inc
+
+MUSA
+Murphy USA Inc
+
+BWMX
+Betterware De Mexico
+
+OGN
+Organon Co
+
+ARLP
+Alliance Resource
+
+ACLS
+Axcelis
+
+BHC
+Bausch Health
+
+DIOD
+Diodes
+
+HAE
+Haemonetics
+
+NSIT
+Insight Enterprises
+
+JEF
+Jefferies Financial
+
+LNC
+Lincoln National
+
+VECO
+Veeco
+
+INSW
+International Seaways
+
+BTU
+Peabody Energy
+
+PENG
+Penguin Solutions
+
+AMRX
+Amneal Pharma A
+
+OSCR
+Oscar Health
+
+SFD
+Smithfield Foods
+
+PTRN
+Pattern Group
+
+A078930
+A078930
+
+A004020
+A004020
+
+A024110
+A024110
+
+A000270
+A000270
+
+A000210
+A000210
+
+A003550
+A003550
+
+A001120
+A001120
+
+A073240
+A073240
+
+A035420
+A035420
+
+A036830
+A036830
+
+A086450
+A086450
+
+A028670
+A028670
+
+A120110
+A120110
+
+A011210
+A011210
+
+A018260
+A018260
+
+A112610
+A112610
+
+A300720
+A300720
+
+A456040
+A456040
+
+A064400
+A064400
+
+A439260
+A439260
+
+CCOLA
+Coca Cola Icecek
+
+ANHYT
+Anadolu Hayat
+
+ANSGR
+Anadolu Sigorta
+
+TRENJ
+Dogal Enerji
+
+AEFES
+Anadolu Efes Malt
+
+TURSG
+Turkiye Sigorta
+
+GEDIK
+Gedik Yatirim
+
+AKSGY
+Akis GYO
+
+RYGYO
+Reysas GYO
+
+AGESA
+Agesa Hayat ve Emeklilik AS
+
+ENJSA
+Enerjisa Enerji
+
+ARDYZ
+Ard Grup Bilisim
+
+AYDEM
+Aydem Yenilenebilir Enerji AS
+
+BASGZ
+Başkent Doğalgaz Dağıtım Gayrimenkul
+
+ATATP
+Atp Ticari Bilgisayar Ağı ve Elektrik
+
+ESCAR
+Escar Turizm Tasimacilik Ticaret AS
+
+ARASE
+Dogu Aras Enerji Yatirimlari AS
+
+GRSEL
+GurSel Turizm Tasimacilik Ve
+
+LIDER
+LDR Turizm AS
+
+AHGAZ
+Ahlatci Dogal Gaz Dagitim Enerji
+
+ANA
+Acciona
+
+ENG
+Enagás
+
+NTGY
+Naturgy Energy
+
+REP
+Repsol
+
+ELE
+Endesa
+
+BKT
+Bankinter
+
+SCYR
+Sacyr
+
+MEL
+Meliá Hotels
+
+ITX
+Inditex
+
+BBVA
+BBVA
+
+SAN
+Santander
+
+ACS
+ACS
+
+MAP
+Mapfre
+
+SAB
+Banco de Sabadell
+
+ALM
+Almirall
+
+CABK
+CaixaBank
+
+ENO
+Elecnor
+
+LOG
+Logista
+
+AENA
+Aena
+
+UCG
+UniCredit
+
+IRE
+Iren
+
+ISP
+Intesa Sanpaolo
+
+BRE
+Freni Brembo
+
+MB
+Mediobanca
+
+DLG
+De Longhi
+
+HER
+Hera
+
+IP
+Interpump
+
+ACE
+ACEA
+
+BMPS
+BCA MPS
+
+CE
+Credito Emiliano
+
+BGN
+Banca Generali
+
+PRY
+Prysmian
+
+ANIM
+Anima Holding SpA
+
+PST
+Poste Italiane
+
+BMED
+Banca Mediolanum
+
+ENAV
+Enav
+
+BAMI
+Banco Bpm
+
+PIRC
+Pirelli & C
+
+ALS
+Altius Minerals
+
+BBD.B
+Bombardier Inc
+
+CHE.UN
+Chemtrade Logistics
+
+CCA
+Cogeco Communications
+
+L
+Loblaw Companies
+
+MX
+Methanex
+
+TECK.B
+Teck Resources B
+
+WN
+George Weston
+
+LUN
+Lundin Mining
+
+SVM
+Silvercorp Metals
+
+ORE
+Orezone Gold
+
+CVE
+Cenovus Energy Inc
+
+SIA
+Sienna Senior Living
+
+BTE
+Baytex Energy Corp
+
+BDT
+Bird Construction
+
+EXE
+Extendicare Inc
+
+CJ
+Cardinal Energy
+
+CRON
+Cronos
+
+NWC
+North West
+
+ATD
+Alimentation Couche Tard
+
+RAT
+Rathbones
+
+NWG
+NatWest Group
+
+VTY
+Vistry Group
+
+LLOY
+Lloyds Banking
+
+KLR
+Keller
+
+KIE
+Kier Group
+
+BT.A
+BT Group
+
+BARC
+Barclays
+
+CMCX
+CMC Markets
+
+VOD
+Vodafone Group PLC
+
+AAL
+Anglo American
+
+SDLF
+Standard Life
+
+CURY
+Currys
+
+TBCG
+TBC Bank Group
+
+BPCR
+BioPharma Credit
+
+IHP
+IntegraFin
+
+QLT
+Quilter
+
+MNG
+M&G
+
+OSB
+OSB Group
+
+SHAW
+Shawbrook Group PLC
+
+8522
+Bank of Nagoya Ltd
+
+8253
+Credit Saison
+
+3405
+Kuraray
+
+8393
+Miyazaki Bank Ltd
+
+8309
+Sumitomo Mitsui
+
+8616
+Tokai Tokyo Finan Holdings Inc
+
+8609
+Okasan Securities Group
+
+8341
+The 77 Bank Ltd
+
+2914
+Japan Tobacco
+
+9107
+Kawasaki Kisen Kaisha
+
+1820
+Nishimatsu Const Co Ltd
+
+1605
+Inpex Corp.
+
+3231
+Nomura Real Estate Holding Inc
+
+8418
+Yamaguchi Financial Group Inc
+
+7744
+Noritsu Koki Co Ltd
+
+8725
+MS&AD Insurance Group Holdings
+
+7181
+Japan Post Insurance
+
+7189
+Nishi-Nippon Fin
+
+7327
+Daishi Hokuetsu Financial
+
+5832
+Chugin Financial Group
+
+NED
+Nedbank Group
+
+SBK
+Standard Bank Grp
+
+ABG
+Absa
+
+SOL
+Sasol Ltd
+
+EXX
+Exxaro Resources
+
+SLM
+Sanlam Ltd
+
+INL
+Investec Ltd
+
+MTM
+Momentum Metropolitan Holdings
+
+RDF
+Redefine Properties
+
+OMU
+Old Mutual
