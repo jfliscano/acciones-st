@@ -367,7 +367,12 @@ def make_chart(df, symbol, atr_period, multiplier):
         font=dict(size=10), dragmode='pan')
     fig.update_yaxes(title_text='')
     last = df.index[-1]
-    fig.update_xaxes(range=[last - pd.Timedelta(days=15), last])
+    start7 = last - pd.Timedelta(days=7)
+    fig.update_xaxes(range=[start7, last])
+    visible = df.loc[start7:last]
+    ymin = visible['Low'].min() * 0.998
+    ymax = visible['High'].max() * 1.002
+    fig.update_yaxes(range=[ymin, ymax])
     return fig, stats
 
 SCREENER_DAYS = 30
@@ -496,7 +501,7 @@ tab_chart = dbc.Container([
     dcc.Download(id='download-trades'),
     html.Div(dcc.Loading(type='circle',
                           children=dcc.Graph(id='main-chart',
-                                             style={'height': '42vh'},
+                                             style={'height': '60vh'},
                                              config={'responsive': True})),
              className='mb-1'),
     dbc.Button('Export PDF', id='export-trades-btn', color='info',
