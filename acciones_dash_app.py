@@ -38,7 +38,7 @@ def _resource_path(relative_path):
 SCRIPT_DIR         = _app_dir()
 DATA_DIR           = os.path.join(SCRIPT_DIR, "acciones_data")
 ACCIONES_FILE      = _resource_path("acciones.txt")
-DEFAULT_INVESTMENT = 10_000
+DEFAULT_INVESTMENT = 1_000
 HISTORY_DAYS       = 365
 INTERVAL           = '1h'
 CACHE_TTL_SECONDS  = 3600  # 1h para datos horarios
@@ -233,11 +233,15 @@ def generate_signals(df, investment=DEFAULT_INVESTMENT):
                 max_drawdown_pct=round(max_dd, 2),
                 trades=trades)
 
+def _sanitize(text):
+    s = str(text) if not isinstance(text, str) else text
+    return s.encode('latin-1', errors='replace').decode('latin-1')
+
 def build_pdf(title, col_names, col_widths, rows):
     pdf = FPDF(orientation='P', format='A4')
     pdf.add_page()
     pdf.set_font('Helvetica', 'B', 14)
-    pdf.cell(0, 10, title, new_x='LMARGIN', new_y='NEXT', align='C')
+    pdf.cell(0, 10, _sanitize(title), new_x='LMARGIN', new_y='NEXT', align='C')
     pdf.ln(4)
     usable = pdf.w - pdf.l_margin - pdf.r_margin
     total = sum(col_widths)
@@ -245,12 +249,12 @@ def build_pdf(title, col_names, col_widths, rows):
     widths = [w * scale for w in col_widths]
     pdf.set_font('Helvetica', 'B', 8)
     for i, name in enumerate(col_names):
-        pdf.cell(widths[i], 6, name, border=1, align='C')
+        pdf.cell(widths[i], 6, _sanitize(name), border=1, align='C')
     pdf.ln()
     pdf.set_font('Helvetica', '', 8)
     for row in rows:
         for i, val in enumerate(row):
-            pdf.cell(widths[i], 5, str(val), border=1, align='C')
+            pdf.cell(widths[i], 5, _sanitize(val), border=1, align='C')
         pdf.ln()
     return bytes(pdf.output())
 
@@ -400,6 +404,22 @@ def screener_single(symbol, atr_p, mult, force_refresh=False):
         change   = change_type,
     )
 
+def winners_single(symbol, atr_p, mult):
+    df = fetch_data(symbol, days=365)
+    if df is None or len(df) < 50:
+        return None
+    df = supertrend(df, atr_period=atr_p, multiplier=mult)
+    stats = generate_signals(df)
+    return dict(
+        symbol=symbol,
+        name=TICKER_NAME.get(symbol, ''),
+        trades=stats['total_trades'],
+        win_rate=stats['win_rate'],
+        total_pnl=stats['total_pnl_usdt'],
+        return_pct=round(((stats['final_value'] / DEFAULT_INVESTMENT) - 1) * 100, 2),
+        max_dd=stats['max_drawdown_pct'],
+    )
+
 app    = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY],
                    title='Acciones SuperTrend 1h')
 server = app.server
@@ -523,8 +543,22 @@ tab_screener = dbc.Container([
     dcc.Loading(type='circle', children=html.Div(id='screener-output')),
 ], fluid=True)
 
+tab_winners = dbc.Container([
+    html.Div([
+        html.Button('Run Winners', id='winners-btn',
+                    className='btn btn-success btn-sm', style={'whiteSpace':'nowrap'}),
+        html.Button('Export PDF', id='export-winners-btn',
+                    className='btn btn-secondary btn-sm', style={'whiteSpace':'nowrap'}),
+        html.Span(id='winners-status', className='text-muted', style={'fontSize':12}),
+    ], style={'display':'flex','alignItems':'center','gap':'6px','flexWrap':'wrap'},
+       className='mb-3'),
+    dcc.Store(id='winners-store', data=None),
+    dcc.Download(id='download-winners'),
+    dcc.Loading(type='circle', children=html.Div(id='winners-output')),
+], fluid=True)
+
 app.layout = dbc.Container([
-    html.H2('Acciones SuperTrend 1h Screener · Backtest 10k', className='text-center mt-3 mb-2'),
+    html.H2('Acciones SuperTrend 1h Screener · Backtest 1k', className='text-center mt-3 mb-2'),
     html.P('Detecta cambios de dirección (BUY=SELL) en velas 1h · 1 año',
            className='text-center text-muted'),
     file_warning,
@@ -533,6 +567,7 @@ app.layout = dbc.Container([
         dbc.Nav([
             dbc.NavItem(dbc.NavLink('Chart', id='tab-chart-link', active=True)),
             dbc.NavItem(dbc.NavLink('Screener', id='tab-screener-link')),
+            dbc.NavItem(dbc.NavLink('Winners', id='tab-winners-link')),
         ], pills=True),
         dbc.Button('Refresh Data', id='refresh-btn', color='secondary',
                    size='sm'),
@@ -544,14 +579,19 @@ app.layout = dbc.Container([
 @callback(
     Output('tab-content', 'children'),
     [Output('tab-chart-link', 'active'),
-     Output('tab-screener-link', 'active')],
+     Output('tab-screener-link', 'active'),
+     Output('tab-winners-link', 'active')],
     [Input('tab-chart-link', 'n_clicks'),
-     Input('tab-screener-link', 'n_clicks')],
+     Input('tab-screener-link', 'n_clicks'),
+     Input('tab-winners-link', 'n_clicks')],
 )
-def switch_tab(nc, ns):
-    if ctx.triggered_id == 'tab-screener-link':
-        return tab_screener, False, True
-    return tab_chart, True, False
+def switch_tab(nc, ns, nw):
+    tid = ctx.triggered_id
+    if tid == 'tab-screener-link':
+        return tab_screener, False, True, False
+    if tid == 'tab-winners-link':
+        return tab_winners, False, False, True
+    return tab_chart, True, False, False
 
 @callback(
     [Output('main-chart',  'figure'),
@@ -760,6 +800,105 @@ def export_screener_pdf(n, store):
                                 store['atr_p'], store['mult'])
     fname = f"Screener_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
     return dcc.send_bytes(pdf_bytes, fname)
+
+@callback(
+    [Output('winners-output', 'children'),
+     Output('winners-status', 'children'),
+     Output('winners-store', 'data')],
+    Input('winners-btn', 'n_clicks'),
+    [State('atr-input', 'value'),
+     State('mult-input', 'value')],
+    prevent_initial_call=True,
+)
+def run_winners(n_clicks, atr_period, multiplier):
+    if not n_clicks:
+        return dash.no_update, dash.no_update, dash.no_update
+
+    atr_period = atr_period or 10
+    multiplier = multiplier or 1.7
+    results, errors = [], []
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = {executor.submit(winners_single, sym, atr_period, multiplier): sym
+                   for sym in ACCIONES_LIST}
+        for future in as_completed(futures):
+            sym = futures[future]
+            try:
+                r = future.result()
+                if r:   results.append(r)
+                else:   errors.append(sym)
+            except Exception as e:
+                log.warning(f"Winners {sym}: {e}")
+                errors.append(sym)
+
+    results.sort(key=lambda x: x['return_pct'], reverse=True)
+
+    status = html.Span([
+        f'Done: {len(results)}/{len(ACCIONES_LIST)} stocks | Sin datos: {len(errors)}',
+    ])
+
+    if not results:
+        return html.Div('No data available', className='text-danger'), status, dash.no_update
+
+    cols    = ['rank', 'symbol', 'name', 'return_pct', 'total_pnl', 'win_rate', 'trades', 'max_dd']
+    col_map = {'rank':'#','symbol':'Symbol','name':'Name','return_pct':'Return %',
+               'total_pnl':'PnL USDT','win_rate':'Win Rate %','trades':'Trades','max_dd':'Max DD %'}
+
+    rows = []
+    for i, r in enumerate(results):
+        color = '#089981' if r['return_pct'] >= 0 else '#f23645'
+        cells = [
+            html.Td(str(i+1), style={'textAlign':'center','padding':'3px 6px','color':'#e0e0e0'}),
+            html.Td(r['symbol'], style={'textAlign':'center','padding':'3px 6px','color':'#e0e0e0','fontWeight':'bold'}),
+            html.Td(r['name'], style={'textAlign':'left','padding':'3px 6px','color':'#e0e0e0','maxWidth':'200px','overflow':'hidden','textOverflow':'ellipsis'}),
+            html.Td(f"{r['return_pct']:.2f}%", style={'textAlign':'center','padding':'3px 6px','color':color,'fontWeight':'bold'}),
+            html.Td(f"{r['total_pnl']:.2f}", style={'textAlign':'center','padding':'3px 6px','color':color}),
+            html.Td(f"{r['win_rate']:.2f}%", style={'textAlign':'center','padding':'3px 6px','color':'#e0e0e0'}),
+            html.Td(str(r['trades']), style={'textAlign':'center','padding':'3px 6px','color':'#e0e0e0'}),
+            html.Td(f"{r['max_dd']:.2f}%", style={'textAlign':'center','padding':'3px 6px','color':'#f23645'}),
+        ]
+        rows.append(html.Tr(cells))
+
+    table = html.Div([
+        html.Div([
+            html.Table([
+                html.Thead(html.Tr([
+                    html.Th(col_map[c], style={'padding':'4px 6px','textAlign':'center','whiteSpace':'nowrap'})
+                    for c in cols])),
+                html.Tbody(rows),
+            ], style={'borderCollapse':'collapse','fontSize':12}),
+        ], style={'overflowX':'auto'}),
+    ], style={'maxHeight':'70vh','overflowY':'auto'})
+
+    store_data = dict(atr_p=atr_period, mult=multiplier,
+                      results=results, errors=errors)
+    return table, status, store_data
+
+@callback(
+    Output('download-winners', 'data'),
+    Input('export-winners-btn', 'n_clicks'),
+    State('winners-store', 'data'),
+    prevent_initial_call=True,
+)
+def export_winners_pdf(n, store):
+    if not store or not store.get('results'):
+        log.warning("export_winners_pdf: no store or no results")
+        return dash.no_update
+    try:
+        cols = ['#', 'Symbol', 'Name', 'Return %', 'PnL USDT', 'Win Rate %', 'Trades', 'Max DD %']
+        widths = [10, 22, 40, 22, 22, 20, 16, 22]
+        rows = [[str(i+1), r['symbol'], r['name'],
+                 f"{r['return_pct']:.2f}%", f"{r['total_pnl']:.2f}",
+                 f"{r['win_rate']:.2f}%", str(r['trades']),
+                 f"{r['max_dd']:.2f}%"]
+                for i, r in enumerate(store['results'])]
+        title = f"Winners SuperTrend 1h 1y | ATR={store['atr_p']} Mult={store['mult']} | {len(store['results'])} stocks"
+        pdf_bytes = build_pdf(title, cols, widths, rows)
+        fname = f"Winners_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+        return dcc.send_bytes(pdf_bytes, fname)
+    except Exception as e:
+        log.exception(f"export_winners_pdf error: {e}")
+        return dash.no_update
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 7860))
