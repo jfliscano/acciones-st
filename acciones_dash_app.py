@@ -373,6 +373,7 @@ def make_chart(df, symbol, atr_period, multiplier):
 SCREENER_DAYS = 30
 
 def screener_single(symbol, atr_p, mult, force_refresh=False):
+    time.sleep(0.4)
     df = fetch_data(symbol, force_refresh=force_refresh, days=SCREENER_DAYS)
     if df is None or len(df) < 5:
         return None
@@ -668,7 +669,7 @@ def run_screener(n_clicks, atr_period, multiplier):
     multiplier = multiplier or 1.7
     results, errors = [], []
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(screener_single, sym, atr_period, multiplier, True): sym
                    for sym in ACCIONES_LIST}
         for future in as_completed(futures):
