@@ -149,64 +149,64 @@ PTRN
 Pattern Group
 
 A078930
-A078930
+GS Holdings
 
 A004020
-A004020
+Hyundai Steel
 
 A024110
-A024110
+Industrial Bank Of Korea
 
 A000270
-A000270
+Kia Corp
 
 A000210
-A000210
+DL Holdings
 
 A003550
-A003550
+LG Corp
 
 A001120
-A001120
+LX International
 
 A073240
-A073240
+Kumho Tire
 
 A035420
-A035420
+Naver Corp
 
 A036830
-A036830
+Soulbrain
 
 A086450
-A086450
+Dongkook Pharmaceutical
 
 A028670
-A028670
+Pan Ocean
 
 A120110
-A120110
+Kolon Industries Inc
 
 A011210
-A011210
+Hyundai Wia
 
 A018260
-A018260
+Samsung SDS Co Ltd
 
 A112610
-A112610
+CS Wind Corp
 
 A300720
-A300720
+Hanilcmt
 
 A456040
-A456040
+OCI
 
 A064400
-A064400
+LG CNS
 
 A439260
-A439260
+Daehan Shipbuilding
 
 CCOLA
 Coca Cola Icecek
