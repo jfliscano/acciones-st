@@ -518,7 +518,7 @@ tab_screener = dbc.Container([
 ], fluid=True)
 
 app.layout = dbc.Container([
-    html.H2('Acciones SuperTrend 1h Screener', className='text-center mt-3 mb-2'),
+    html.H2('Acciones SuperTrend 1h Screener · Backtest 10k', className='text-center mt-3 mb-2'),
     html.P('Detecta cambios de dirección (BUY=SELL) en velas 1h · 1 año',
            className='text-center text-muted'),
     file_warning,
