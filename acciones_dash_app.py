@@ -258,7 +258,7 @@ def build_pdf(title, col_names, col_widths, rows):
         pdf.ln()
     return bytes(pdf.output())
 
-def export_trades(trades, symbol, atr_p, mult, investment=10000):
+def export_trades(trades, symbol, atr_p, mult, investment=1000):
     cols = ['Type', 'Entry', 'Exit', 'Entry $', 'Exit $', 'Ret%', 'PnL']
     widths = [14, 22, 22, 22, 22, 18, 22]
     rows = [[t['type'], t['entry_date'], t['exit_date'],
@@ -516,6 +516,17 @@ tab_chart = dbc.Container([
                 clearable=False, style={'color': '#333'}),
         ], xs=12),
     ], className='mb-1'),
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.Span('Custom: ', style={'fontWeight':600,'fontSize':12,'color':'#aaa'}),
+                dcc.Input(id='custom-symbol-input', type='text', placeholder='Ticker (ej: BTC-USD)',
+                          className='form-control',
+                          style={'width':160,'height':28,'fontSize':13,'padding':'2px 6px'}),
+                html.Small(' (vacío = usa el dropdown)', style={'fontSize':10,'color':'#666'}),
+            ], style={'display':'flex','alignItems':'center','gap':4,'flexWrap':'wrap'}),
+        ], xs=12),
+    ], className='mb-1'),
     html.Div(id='stats-cards', className='mb-1'),
     dcc.Store(id='chart-stats-store', data=None),
     dcc.Download(id='download-trades'),
@@ -601,10 +612,15 @@ def switch_tab(nc, ns, nw):
     [Input('symbol-dropdown', 'value'),
      Input('atr-input',       'value'),
      Input('mult-input',      'value'),
-     Input('refresh-btn',     'n_clicks')],
+     Input('refresh-btn',     'n_clicks'),
+     Input('custom-symbol-input', 'n_submit')],
+    [State('custom-symbol-input', 'value')],
     prevent_initial_call=False,
 )
-def update_chart(symbol, atr_period, multiplier, _n):
+def update_chart(symbol, atr_period, multiplier, _n, _submit, custom_sym):
+    # custom_sym from text input overrides dropdown
+    if custom_sym and custom_sym.strip():
+        symbol = custom_sym.strip()
     if not symbol:
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
@@ -714,7 +730,7 @@ def run_screener(n_clicks, atr_period, multiplier):
     multiplier = multiplier or 1.7
     results, errors = [], []
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(screener_single, sym, atr_period, multiplier, True): sym
                    for sym in ACCIONES_LIST}
         for future in as_completed(futures):
@@ -818,7 +834,7 @@ def run_winners(n_clicks, atr_period, multiplier):
     multiplier = multiplier or 1.7
     results, errors = [], []
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(winners_single, sym, atr_period, multiplier): sym
                    for sym in ACCIONES_LIST}
         for future in as_completed(futures):
